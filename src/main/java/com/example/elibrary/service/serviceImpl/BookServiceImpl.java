@@ -10,7 +10,6 @@ import com.example.elibrary.repository.BookRepository;
 import com.example.elibrary.repository.BookRepositoryImpl;
 import com.example.elibrary.service.BookService;
 import com.example.elibrary.service.FileService;
-import com.example.elibrary.service.mapper.BookDetailMapper;
 import com.example.elibrary.service.mapper.BookMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -164,6 +163,19 @@ public class BookServiceImpl implements BookService {
                 .data(products.map(bookMapper::toDto))
                 .build();
 
+    }
+    @Override
+    public ResponseDto<List<BookDto>> getExpensiveBooks() {
+        List<Book> expensiveBooks = bookRepository.getExpensiveBooks();
+        List<BookDto> list = expensiveBooks.stream()
+                .map(book -> bookMapper.toDto(book))
+                .toList();
+        return ResponseDto.<List<BookDto>>builder()
+                .code(OK_CODE)
+                .message(OK)
+                .success(true)
+                .data(list)
+                .build();
     }
 
 

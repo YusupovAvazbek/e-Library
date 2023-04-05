@@ -42,5 +42,9 @@ public class BookResources {
     public ResponseDto<Page<BookDto>> universalSearch2(@RequestParam Map<String,String> params){
         return bookService.universalSearch(params);
     }
+    @GetMapping("get-expensive-book")
+    public ResponseDto<List<BookDto>> getExpensiveBooks(){
+        return bookService.getExpensiveBooks();
+    }
 
 }

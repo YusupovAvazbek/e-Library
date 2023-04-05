@@ -17,4 +17,6 @@ public interface BookService {
     ResponseDto<BookDto> getById(Integer id);
 
     ResponseDto<Page<BookDto>> universalSearch(Map<String, String> params);
+
+    ResponseDto<List<BookDto>> getExpensiveBooks();
 }
