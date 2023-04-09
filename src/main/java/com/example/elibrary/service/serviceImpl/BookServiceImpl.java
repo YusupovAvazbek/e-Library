@@ -8,11 +8,16 @@ import com.example.elibrary.model.BookDetail;
 import com.example.elibrary.repository.BookDetailRepository;
 import com.example.elibrary.repository.BookRepository;
 import com.example.elibrary.repository.BookRepositoryImpl;
+import com.example.elibrary.rest.BookResources;
 import com.example.elibrary.service.BookService;
 import com.example.elibrary.service.FileService;
 import com.example.elibrary.service.mapper.BookMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,6 +25,7 @@ import java.util.*;
 
 import static com.example.elibrary.service.validator.AppStatusCode.*;
 import static com.example.elibrary.service.validator.AppStatusMessages.*;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @Service
 @RequiredArgsConstructor
@@ -30,13 +36,36 @@ public class BookServiceImpl implements BookService {
     private final BookRepositoryImpl bookRepositoryImpl;
     private final FileService fileService;
     @Override
-    public ResponseDto<List<BookDto>> getAll() {
-        List<Book> all = bookRepository.findAll();
-        return ResponseDto.<List<BookDto>>builder()
+    public ResponseDto<Page<EntityModel<BookDto>>> getAllBooks(Integer page, Integer size) {
+        size = Math.max(size, 1);
+        page = Math.max(page, 0);
+        Long count = bookRepository.count();
+        PageRequest pageRequest = PageRequest.of((count / size) <= page ?
+                (count % size == 0) ? (int) (count / size) - 1 : (int) (count / size)
+                : page, size);
+        pageRequest.withSort(Sort.by("price").descending());
+
+        Page<EntityModel<BookDto>> all = bookRepository
+                .findAll(pageRequest)
+                .map(p-> {
+                    EntityModel<BookDto> entityModel = EntityModel.of(bookMapper.toDto(p));
+                    try {
+                        entityModel.add(linkTo(BookResources.class
+                                .getDeclaredMethod("getById", Integer.class, HttpServletRequest.class))
+                                .withSelfRel()
+                                .expand(p.getId()));
+                    } catch (NoSuchMethodException e) {
+                        throw new RuntimeException(e);
+                    }
+                    return entityModel;
+
+                });
+
+        return ResponseDto.<Page<EntityModel<BookDto>>>builder()
                 .code(OK_CODE)
                 .success(true)
                 .message(OK)
-                .data(all.stream().map(b -> bookMapper.toDto(b)).toList())
+                .data(all)
                 .build();
     }
     @Override

@@ -8,6 +8,7 @@ import com.example.elibrary.service.serviceImpl.BookServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,8 +23,8 @@ import java.util.Map;
 public class BookResources {
     private final BookService bookService;
     @GetMapping
-    public ResponseDto<List<BookDto>> getAll(){
-        return bookService.getAll();
+    public ResponseDto<Page<EntityModel<BookDto>>> getAllBooks(@RequestParam(defaultValue = "0")Integer page, @RequestParam(defaultValue = "1") Integer size){
+        return bookService.getAllBooks(page, size);
     }
     @PostMapping(consumes = {"multipart/form-data", "application/json"})
     public ResponseDto<BookDto> add(@RequestPart BookDto bookInfo, @RequestPart MultipartFile file) throws IOException {
@@ -39,10 +40,10 @@ public class BookResources {
         return bookService.getById(id);
     }
     @GetMapping("universal-search")
-    public ResponseDto<Page<BookDto>> universalSearch2(@RequestParam Map<String,String> params){
+    public ResponseDto<Page<BookDto>> universalSearch(@RequestParam Map<String,String> params){
         return bookService.universalSearch(params);
     }
-    @GetMapping("get-expensive-book")
+    @GetMapping("expensive-by-genre")
     public ResponseDto<List<BookDto>> getExpensiveBooks(){
         return bookService.getExpensiveBooks();
     }

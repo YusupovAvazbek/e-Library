@@ -52,6 +52,12 @@ public class FileServiceImpl implements FileService {
                     .build();
         }
     }
+
+    @Override
+    public ResponseDto<Byte[]> getBook(Integer id) {
+        return null;
+    }
+
     public static String filePath(String folder,String ext){
         LocalDate localDate = LocalDate.now();
         String path = localDate.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));

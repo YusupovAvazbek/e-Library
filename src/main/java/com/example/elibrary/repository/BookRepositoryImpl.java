@@ -65,6 +65,9 @@ public class BookRepositoryImpl {
         if(params.containsKey("price")){
             queryCondition.append(" AND p.price = :price ");
         }
+        if(params.containsKey("author")){
+            queryCondition.append(" AND upper(p.bookDetail.author) like :author");
+        }
     }
     private void setParam(Query query , Map<String , String> params){
         if(params.containsKey("title")){
@@ -78,6 +81,9 @@ public class BookRepositoryImpl {
         }
         if(params.containsKey("price")){
             query.setParameter("price",Integer.parseInt(params.get("price")));
+        }
+        if (params.containsKey("author")){
+            query.setParameter("author","%"+params.get("author").toUpperCase()+"%");
         }
     }
 }
