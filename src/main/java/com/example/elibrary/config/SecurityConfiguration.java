@@ -1,7 +1,7 @@
 package com.example.elibrary.config;
 
+import com.example.elibrary.dto.ResponseDto;
 import com.example.elibrary.security.JwtFilter;
-import com.example.elibrary.service.UserService;
 import com.example.elibrary.service.serviceImpl.UserServiceImpl;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +17,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import static com.example.elibrary.service.validator.AppStatusCode.VALIDATION_ERROR_CODE;
 
 @Configuration
 @EnableWebSecurity
@@ -29,6 +32,8 @@ public class SecurityConfiguration {
     UserServiceImpl userService;
     @Autowired
     JwtFilter jwtFilter;
+    @Autowired
+    Gson gson;
     @Autowired
     public void authenticationManager(AuthenticationManagerBuilder auth) throws Exception {
         auth
@@ -50,13 +55,14 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests()
                 .requestMatchers(HttpMethod.POST,"/user").permitAll()
                 .requestMatchers("/user/login").permitAll()
+                .requestMatchers("/swagger-ui/**","/swagger-ui.html","/v3/api-docs/**").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
+                //.exceptionHandling(e->e.authenticationEntryPoint(entryPoint()))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
-
     @Bean
     public PasswordEncoder passwordEncoder(){
 

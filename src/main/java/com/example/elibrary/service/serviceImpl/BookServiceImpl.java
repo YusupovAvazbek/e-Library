@@ -38,7 +38,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public ResponseDto<Page<EntityModel<BookDto>>> getAllBooks(Integer page, Integer size) {
         size = Math.max(size, 1);
-        page = Math.max(page, 0);
+        page = Math.max(page, 1);
         Long count = bookRepository.count();
         PageRequest pageRequest = PageRequest.of((count / size) <= page ?
                 (count % size == 0) ? (int) (count / size) - 1 : (int) (count / size)

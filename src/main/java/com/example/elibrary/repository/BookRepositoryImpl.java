@@ -54,7 +54,7 @@ public class BookRepositoryImpl {
 
     private void generateQueryCondition(StringBuilder queryCondition , Map<String , String> params){
         if(params.containsKey("title")){
-            queryCondition.append(" and upper(p.name) like :title ");
+            queryCondition.append(" and upper(p.title) like :title ");
         }
         if(params.containsKey("amount")){
             queryCondition.append(" AND p.amount = :amount ");
@@ -71,7 +71,7 @@ public class BookRepositoryImpl {
     }
     private void setParam(Query query , Map<String , String> params){
         if(params.containsKey("title")){
-            query.setParameter("name","%"+params.get("name").toUpperCase()+"%");
+            query.setParameter("title","%"+params.get("title").toUpperCase()+"%");
         }
         if(params.containsKey("amount")){
             query.setParameter("amount",Integer.parseInt(params.get("amount")));
