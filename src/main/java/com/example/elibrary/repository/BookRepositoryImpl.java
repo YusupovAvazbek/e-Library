@@ -54,7 +54,7 @@ public class BookRepositoryImpl {
 
     private void generateQueryCondition(StringBuilder queryCondition , Map<String , String> params){
         if(params.containsKey("title")){
-            queryCondition.append(" and upper(p.title) like :title ");
+            queryCondition.append(" and upper(p.title ) like :title ");
         }
         if(params.containsKey("amount")){
             queryCondition.append(" AND p.amount = :amount ");
