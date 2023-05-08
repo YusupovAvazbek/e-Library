@@ -21,9 +21,11 @@ public class UserResources {
     private final UserService userService;
 
     @Operation(
-            method = "get all users",
-            summary = "get all users",
-            description = "get all users"
+            method = "get user by email",
+            summary = "get user",
+            description = "get active user by email",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "User info",
+            content = @Content(mediaType = "application/json"))
     )
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ROLE_USER')")
@@ -34,7 +36,7 @@ public class UserResources {
             method = "Add new User",
             summary = "Add new User",
             description = "Need to send UsersDto to this end point to create new user",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Users info",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "send UsersDto",
                     content = @Content(mediaType = "application/json")
             )
     )
