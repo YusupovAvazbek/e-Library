@@ -10,12 +10,17 @@ import com.example.elibrary.service.UserService;
 import com.example.elibrary.service.mapper.UserMapper;
 import static com.example.elibrary.service.validator.AppStatusCode.*;
 import static com.example.elibrary.service.validator.AppStatusMessages.*;
+
+import com.github.cage.Cage;
+import com.github.cage.GCage;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Optional;
 
 @Service
@@ -118,6 +123,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseDto<String> login(LoginDto loginDto) {
+        if(loginDto.getCaptcha() == null){
+            return ResponseDto.<String>builder()
+                    .code(OK_CODE)
+                    .message("qayta urinib ko`ring")
+                    .build();
+        }
         UsersDto users = loadUserByUsername(loginDto.getUsername());
         if(!passwordEncoder.matches(loginDto.getPassword(), users.getPassword())){
             return ResponseDto.<String>builder()
@@ -134,7 +145,23 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
-
+    public ResponseDto<String> generateCaptcha(HttpServletResponse resp) throws IOException {
+        GCage gCage = new GCage();
+        resp.setContentType("image/" + gCage.getFormat());
+        resp.setHeader("Cache-Control", "no-cache");
+        resp.setDateHeader("Expires", 0);
+        resp.setHeader("Progma", "no-cache");
+        resp.setDateHeader("Max-Age", 0);
+        Cage cage = new GCage();
+        String captcha = cage.getTokenGenerator().next();
+        gCage.draw(captcha, resp.getOutputStream());
+        return ResponseDto.<String>builder()
+                .code(OK_CODE)
+                .message(OK)
+                .success(true)
+                .data(captcha)
+                .build();
+    }
     public Users editHelper(Users user, UsersDto usersDto){
         if(usersDto.getEmail() != null){
             user.setEmail(usersDto.getEmail());

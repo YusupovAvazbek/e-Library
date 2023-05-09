@@ -55,6 +55,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests()
                 .requestMatchers(HttpMethod.POST,"/user").permitAll()
                 .requestMatchers("/user/login").permitAll()
+                .requestMatchers("/user/captcha").permitAll()
                 .requestMatchers("/swagger-ui/**","/swagger-ui.html","/v3/api-docs/**").permitAll()
                 .anyRequest()
                 .authenticated()

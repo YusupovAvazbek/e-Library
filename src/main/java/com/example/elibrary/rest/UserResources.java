@@ -4,14 +4,18 @@ import com.example.elibrary.dto.LoginDto;
 import com.example.elibrary.dto.ResponseDto;
 import com.example.elibrary.dto.UsersDto;
 import com.example.elibrary.service.UserService;
+import com.example.elibrary.service.serviceImpl.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.ServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.Link;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/user")
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @SecurityRequirement(name = "Authorization")
 public class UserResources {
     private final UserService userService;
+    private final UserServiceImpl service;
 
     @Operation(
             method = "get user by email",
@@ -76,5 +81,9 @@ public class UserResources {
         ResponseDto<String> response = userService.login(loginDto);
         response.add(link);
         return response;
+    }
+    @GetMapping("/captcha")
+    public ResponseDto<String> captcha(HttpServletResponse resp) throws IOException {
+        return service.generateCaptcha(resp);
     }
 }
